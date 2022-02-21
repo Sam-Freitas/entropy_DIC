@@ -1,17 +1,21 @@
 
 % imgs_dir = "Y:\Users\Raul Castro\Microscopes\Olympus Spining Disk\2022-02-16\ImageJ processed\RENCA_A28_5FBS_3HAA_1";
-containing_folder = "/Volumes/Sutphin server/Users/Raul Castro/Microscopes/Olympus Spining Disk/2022-01-25/ImageJ processed";
+containing_folder = "/Volumes/Sutphin server/Users/Raul Castro/Microscopes/Olympus Spining Disk/2022-02-16/ImageJ processed";
+ovr_dir = dir(containing_folder);
+ovr_dir(ismember( {ovr_dir.name}, {'.', '..'})) = [];  %remove . and ..
 
-imgs_dir = "/Volumes/Sutphin server/Users/Raul Castro/Microscopes/Olympus Spining Disk/2022-01-25/ImageJ processed/RENCA_A28_DFO_27";
+imgs_dir = fullfile(ovr_dir(1).folder,ovr_dir(1).name);
+
 img_paths = dir(fullfile(imgs_dir,'*.tif'));
 
-
+progress_bar = 0;
 for i = 1:length(img_paths)
-    
+    progress_bar = progressbar_function(i,length(img_paths),progress_bar);
     imgs{i} = imread(fullfile(imgs_dir,img_paths(i).name));
-    
     E_imgs{i} = entropyfilt(imgs{i},true(15));
-    
+    if isequal(i,length(img_paths))
+        close_progressbar(progress_bar)
+    end
 end
 
 large_E_array = imtile(E_imgs);
@@ -39,3 +43,22 @@ end
 
 figure;
 plot(amount_open/max(amount_open))
+
+
+function progress_bar = progressbar_function(i,num_samples,progress_bar)
+
+progress_ratio = i/num_samples;
+
+if isequal(progress_bar,0)
+    progress_bar = waitbar(progress_ratio,'Processing data');
+else
+    progress_bar = waitbar(progress_ratio,progress_bar,'Processing data');
+end
+
+end
+
+function close_progressbar(progress_bar)
+
+close(progress_bar)
+
+end
