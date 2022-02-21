@@ -43,15 +43,17 @@ for i = 1:num_conditions
     
     avg_norm_data = medfilt1(mean(norm_data,2),5);
     
-    plot(1:length(avg_norm_data),avg_norm_data,std(norm_data,0,2));
+    sums(i) = sum(avg_norm_data);
+    
+    plot(1:length(avg_norm_data),avg_norm_data);
     
 end
 legend(condition)
 
 
-
-
-
+figure;
+bar(sums);
+xticklabels(condition)
 
 
 
