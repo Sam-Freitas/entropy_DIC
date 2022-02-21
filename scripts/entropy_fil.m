@@ -1,7 +1,10 @@
 
-imgs_dir = "Y:\Users\Raul Castro\Microscopes\Olympus Spining Disk\2022-02-16\ImageJ processed\RENCA_A28_5FBS_3HAA_1";
+% imgs_dir = "Y:\Users\Raul Castro\Microscopes\Olympus Spining Disk\2022-02-16\ImageJ processed\RENCA_A28_5FBS_3HAA_1";
+containing_folder = "/Volumes/Sutphin server/Users/Raul Castro/Microscopes/Olympus Spining Disk/2022-01-25/ImageJ processed";
 
+imgs_dir = "/Volumes/Sutphin server/Users/Raul Castro/Microscopes/Olympus Spining Disk/2022-01-25/ImageJ processed/RENCA_A28_DFO_27";
 img_paths = dir(fullfile(imgs_dir,'*.tif'));
+
 
 for i = 1:length(img_paths)
     
