@@ -22,7 +22,7 @@ fprintf('There are %i files with *.CSV exts.\n',numel(CSV_filepaths));
 
 CSV_filepaths = natsort(CSV_filepaths);
 
-kmeans_idx = sort(kmeans(char(string(CSV_filepaths)),num_conditions));
+kmeans_idx = kmeans(char(string(CSV_filepaths)),num_conditions);
 
 hold on
 for i = 1:num_conditions
@@ -50,10 +50,11 @@ for i = 1:num_conditions
 end
 legend(condition)
 
+[val,idx] = sort(sums);
 
 figure;
-bar(sums);
-xticklabels(condition)
+bar(val);
+xticklabels(condition(idx))
 
 
 

@@ -3,8 +3,8 @@ close all force hidden
 warning('off', 'MATLAB:MKDIR:DirectoryExists');
 
 % imgs_dir = "Y:\Users\Raul Castro\Microscopes\Olympus Spining Disk\2022-02-16\ImageJ processed\RENCA_A28_5FBS_3HAA_1";
-containing_folder = "/Volumes/Sutphin server/Users/Raul Castro/Microscopes/Olympus Spining Disk/2022-02-16/ImageJ processed";
-% containing_folder = "Y:\Users\Raul Castro\Microscopes\Olympus Spining Disk\2022-02-16\ImageJ processed";
+% containing_folder = "/Volumes/Sutphin server/Users/Raul Castro/Microscopes/Olympus Spining Disk/2022-02-16/ImageJ processed";
+containing_folder = "Y:\Users\Raul Castro\Microscopes\Olympus Spining Disk\2022-02-16\ImageJ processed";
 ovr_dir = dir(containing_folder);
 ovr_dir(ismember( {ovr_dir.name}, {'.', '..'})) = [];  %remove . and ..
 
@@ -29,7 +29,7 @@ for i = 1:length(ovr_dir)
         % read in image
         imgs{j} = imread(fullfile(imgs_dir,sorted_img_paths{j}));
         % entropy filter the image for amount of disturbance
-        E_imgs{j} = entropyfilt(imgs{j},true(9));
+        E_imgs{j} = entropyfilt(imgs{j},true(25));
         if isequal(j,num_imgs)
             % combine all the entropy images
             large_E_array = imtile(E_imgs);
@@ -48,7 +48,6 @@ for i = 1:length(ovr_dir)
     inflection_point = find(P==max(P));
     % get inflection point as a number
     E_sep_point = edges(inflection_point);
-    
     
     mkdir(fullfile(pwd,'output',this_exp));
     progress_bar = 0;
@@ -70,6 +69,9 @@ for i = 1:length(ovr_dir)
             rgb_E = cat(3,uint8_E_img,uint8_E_img,uint8_E_img);
 
             out_label = labeloverlay(uint8(img_norm*255),E_mask,'Colormap','autumn','Transparency',0.75);
+            if length(size(out_label)) < 3
+                out_label = cat(3,out_label,out_label,out_label);
+            end
             out_img = [rgb_img,rgb_mask;rgb_E,out_label];
             
             if isequal(j,1)
