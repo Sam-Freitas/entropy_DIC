@@ -3,8 +3,8 @@ close all force hidden
 warning('off', 'MATLAB:MKDIR:DirectoryExists');
 
 % imgs_dir = "Y:\Users\Raul Castro\Microscopes\Olympus Spining Disk\2022-02-16\ImageJ processed\RENCA_A28_5FBS_3HAA_1";
-% containing_folder = "/Volumes/Sutphin server/Users/Raul Castro/Microscopes/Olympus Spining Disk/2022-02-16/ImageJ processed";
-containing_folder = "Y:\Users\Raul Castro\Microscopes\Olympus Spining Disk\2022-02-16\ImageJ processed";
+containing_folder = "/Volumes/Sutphin server/Users/Raul Castro/Microscopes/Olympus Spining Disk/2022-02-16/ImageJ processed";
+% containing_folder = "Y:\Users\Raul Castro\Microscopes\Olympus Spining Disk\2022-02-16\ImageJ processed";
 ovr_dir = dir(containing_folder);
 ovr_dir(ismember( {ovr_dir.name}, {'.', '..'})) = [];  %remove . and ..
 
@@ -29,7 +29,7 @@ for i = 1:length(ovr_dir)
         % read in image
         imgs{j} = imread(fullfile(imgs_dir,sorted_img_paths{j}));
         % entropy filter the image for amount of disturbance
-        E_imgs{j} = entropyfilt(imgs{j},true(15));
+        E_imgs{j} = entropyfilt(imgs{j},true(9));
         if isequal(j,num_imgs)
             % combine all the entropy images
             large_E_array = imtile(E_imgs);
@@ -71,8 +71,16 @@ for i = 1:length(ovr_dir)
 
             out_label = labeloverlay(uint8(img_norm*255),E_mask,'Colormap','autumn','Transparency',0.75);
             out_img = [rgb_img,rgb_mask;rgb_E,out_label];
-
-            imwrite(out_img,fullfile(pwd,'output',this_exp,[num2str(j) '.jpg']))
+            
+            if isequal(j,1)
+                h = imshow(out_img);
+                gif(fullfile(pwd,'output',this_exp,[this_exp '.gif']),'DelayTime',1/24,'overwrite',true)
+            else
+                set(h,'CData',out_img)
+                gif
+            end
+% 
+%             imwrite(out_img,fullfile(pwd,'output',this_exp,[num2str(j) '.jpg']))
         end
         if isequal(j,num_imgs)
             close_progressbar(progress_bar)
