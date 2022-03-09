@@ -7,6 +7,7 @@ warning('off', 'MATLAB:MKDIR:DirectoryExists');
 containing_folder = "Y:\Users\Raul Castro\Microscopes\Olympus Spining Disk\2022-02-16\ImageJ processed";
 ovr_dir = dir(containing_folder);
 ovr_dir(ismember( {ovr_dir.name}, {'.', '..'})) = [];  %remove . and ..
+exp_names = string(natsort({ovr_dir.name}))';
 
 export_gif = 1;
 export_frames = 0;
@@ -14,12 +15,12 @@ export_frames = 0;
 use_inital_largest_mask = 1;
 
 mkdir('output');
-for i = 1:length(ovr_dir)
+for i = 1:length(exp_names)
         
-    this_exp = ovr_dir(i).name;
+    this_exp = char(exp_names(i));
     this_exp_display = replace(this_exp,'_','-');
     
-    imgs_dir = fullfile(ovr_dir(1).folder,this_exp);
+    imgs_dir = fullfile(containing_folder,this_exp);
     
     img_paths = dir(fullfile(imgs_dir,'*.tif'));
     sorted_img_paths = natsort({img_paths.name});
