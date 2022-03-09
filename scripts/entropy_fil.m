@@ -136,6 +136,9 @@ for i = 1:length(exp_names)
     
 end
 
+close all
+disp('Finished processing data')
+
 
 function plot_data_simple(this_exp,edges,smooth_N,inflection_point,amount_open,path_to_export)
 
