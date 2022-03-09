@@ -8,7 +8,10 @@ containing_folder = "Y:\Users\Raul Castro\Microscopes\Olympus Spining Disk\2022-
 ovr_dir = dir(containing_folder);
 ovr_dir(ismember( {ovr_dir.name}, {'.', '..'})) = [];  %remove . and ..
 
-export_images = 1;
+export_gif = 1;
+export_frames = 0;
+
+use_inital_largest_mask = 1;
 
 mkdir('output');
 for i = 1:length(ovr_dir)
@@ -23,11 +26,23 @@ for i = 1:length(ovr_dir)
     
     num_imgs = length(sorted_img_paths);
     
+    imgs = cell(1,num_imgs);
+    E_imgs = cell(1,num_imgs);
+    
     progress_bar = 0;
     for j = 1:num_imgs
-        progress_bar = progressbar_function(j,num_imgs,progress_bar,{'Processing data',char(this_exp_display)});
-        % read in image
-        imgs{j} = imread(fullfile(imgs_dir,sorted_img_paths{j}));
+        progress_bar = progressbar_function(j,num_imgs,progress_bar,{'Loading data',char(this_exp_display)});
+        imgs{j} = double(imread(fullfile(imgs_dir,sorted_img_paths{j})));
+        imgs{j} = imgs{j}/max(imgs{j}(:));
+%         imgs{j} = histeq(imgs{j},imhist(imgs{1}));
+        if isequal(j,num_imgs)
+            close_progressbar(progress_bar)
+        end
+    end
+    
+    progress_bar = 0;
+    for j = 1:num_imgs
+        progress_bar = progressbar_function(j,num_imgs,progress_bar,{'Processing data',char(this_exp_display)});       
         % entropy filter the image for amount of disturbance
         E_imgs{j} = entropyfilt(imgs{j},true(25));
         if isequal(j,num_imgs)
@@ -49,14 +64,23 @@ for i = 1:length(ovr_dir)
     % get inflection point as a number
     E_sep_point = edges(inflection_point);
     
+    % processing 
+    E_mask_1 = (E_imgs{1} < E_sep_point);
+    
+    inital_largest_mask = imfill(imgaussfilt(bwareafilt(E_mask_1,1)*2.5,3)>0,'holes');
+    
     mkdir(fullfile(pwd,'output',this_exp));
     progress_bar = 0;
     for j = 1:num_imgs
         progress_bar = progressbar_function(j,num_imgs,progress_bar,{'Writing data',char(this_exp_display)});
         
         amount_open(j) = sum(sum(E_imgs{j}<E_sep_point));
-        if export_images
+        if export_gif
             E_mask = (E_imgs{j} < E_sep_point);
+            
+            if use_inital_largest_mask
+                E_mask = inital_largest_mask.*E_mask;
+            end
 
             img_norm = double(imgs{j})/double(max(nonzeros(imgs{j})));
 
@@ -81,8 +105,9 @@ for i = 1:length(ovr_dir)
                 set(h,'CData',out_img)
                 gif
             end
-% 
-%             imwrite(out_img,fullfile(pwd,'output',this_exp,[num2str(j) '.jpg']))
+            if export_frames
+                imwrite(out_img,fullfile(pwd,'output',this_exp,[num2str(j) '.jpg']))
+            end
         end
         if isequal(j,num_imgs)
             close_progressbar(progress_bar)
