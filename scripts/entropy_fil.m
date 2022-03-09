@@ -34,16 +34,19 @@ for i = 1:length(ovr_dir)
         progress_bar = progressbar_function(j,num_imgs,progress_bar,{'Loading data',char(this_exp_display)});
         imgs{j} = double(imread(fullfile(imgs_dir,sorted_img_paths{j})));
         imgs{j} = imgs{j}/max(imgs{j}(:));
-%         imgs{j} = histeq(imgs{j},imhist(imgs{1}));
+        mean_vals(j) = mean2(imgs{j});
         if isequal(j,num_imgs)
             close_progressbar(progress_bar)
         end
     end
     
+    mean_of_stack = mean(mean_vals);
+    
     progress_bar = 0;
     for j = 1:num_imgs
         progress_bar = progressbar_function(j,num_imgs,progress_bar,{'Processing data',char(this_exp_display)});       
         % entropy filter the image for amount of disturbance
+        imgs{j} = imgs{j}*mean_of_stack/mean_vals(j);
         E_imgs{j} = entropyfilt(imgs{j},true(25));
         if isequal(j,num_imgs)
             % combine all the entropy images
@@ -82,7 +85,8 @@ for i = 1:length(ovr_dir)
                 E_mask = inital_largest_mask.*E_mask;
             end
 
-            img_norm = double(imgs{j})/double(max(nonzeros(imgs{j})));
+            img_norm = imgs{j};
+            img_norm(img_norm>1) = 1;
 
             uint8_img = uint8(img_norm*255);
             uint8_mask = uint8(E_mask*255);
