@@ -2,34 +2,37 @@ clear all
 close all force hidden
 warning('off', 'MATLAB:MKDIR:DirectoryExists');
 
-% imgs_dir = "Y:\Users\Raul Castro\Microscopes\Olympus Spining Disk\2022-02-16\ImageJ processed\RENCA_A28_5FBS_3HAA_1";
-% containing_folder = "/Volumes/Sutphin server/Users/Raul Castro/Microscopes/Olympus Spining Disk/2022-02-16/ImageJ processed";
+% settings to change for specific use cases
 containing_folder = "Y:\Users\Raul Castro\Microscopes\Olympus Spining Disk\2022-02-16\ImageJ processed";
+export_gif = 1; % export the data into a gif format - binary yes(1) no(0)
+export_frames = 0; % export the frames of the gif aswell - binary yes(1) no(0)
+use_inital_largest_mask = 1; % Use the largest intial mask for baseof the segmentation - binary yes(1) no(0)
+
+image_type_format = '*.tif'; % must be in format '*.xxx'
+% this is the type of images that the system will use 
+% currently only tested on tif files
+
+% Data processing section
 ovr_dir = dir(containing_folder);
 ovr_dir(ismember( {ovr_dir.name}, {'.', '..'})) = [];  %remove . and ..
 exp_names = string(natsort({ovr_dir.name}))';
 
-export_gif = 1;
-export_frames = 0;
-
-use_inital_largest_mask = 1;
-
 mkdir('output');
 for i = 1:length(exp_names)
         
+    % locate and sort the images in the given folder
     this_exp = char(exp_names(i));
     this_exp_display = replace(this_exp,'_','-');
-    
     imgs_dir = fullfile(containing_folder,this_exp);
-    
-    img_paths = dir(fullfile(imgs_dir,'*.tif'));
+    img_paths = dir(fullfile(imgs_dir,image_type_format));
     sorted_img_paths = natsort({img_paths.name});
-    
     num_imgs = length(sorted_img_paths);
     
+    % preallocate the cells for images and subsequent data processes
     imgs = cell(1,num_imgs);
     E_imgs = cell(1,num_imgs);
     
+    % read in the images and normalize them between 0->1
     progress_bar = 0;
     for j = 1:num_imgs
         progress_bar = progressbar_function(j,num_imgs,progress_bar,{'Loading data',char(this_exp_display)});
@@ -43,6 +46,9 @@ for i = 1:length(exp_names)
     
     mean_of_stack = mean(mean_vals);
     
+    % entropy filter the normalized images
+    % before processing the images are self normalized per experiment to
+    % ensure exposure is at least similar
     progress_bar = 0;
     for j = 1:num_imgs
         progress_bar = progressbar_function(j,num_imgs,progress_bar,{'Processing data',char(this_exp_display)});       
@@ -58,7 +64,7 @@ for i = 1:length(exp_names)
         end
     end
     
-    % this get the segmentation threshold  
+    % this get the segmentation threshold (inflection point) 
     % smooth the histogram 
     smooth_N = smooth(N,10,'rloess');
     % find local minimus and prominance (derivative to a point)
@@ -68,11 +74,12 @@ for i = 1:length(exp_names)
     % get inflection point as a number
     E_sep_point = edges(inflection_point);
     
-    % processing 
+    % processing/segmentation
     E_mask_1 = (E_imgs{1} < E_sep_point);
-    
     inital_largest_mask = imfill(imgaussfilt(bwareafilt(E_mask_1,1)*2.5,3)>0,'holes');
     
+    % this is all exporting and very little data processing
+    % the amount_open is the segmentation data
     mkdir(fullfile(pwd,'output',this_exp));
     progress_bar = 0;
     for j = 1:num_imgs
