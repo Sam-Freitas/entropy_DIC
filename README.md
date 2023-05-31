@@ -5,4 +5,7 @@ This is a simple cell segmentation (isolation) algorithm that is able to segment
 
 Our implementation is for scratch assay analysis (ref: https://www.nature.com/articles/nprot.2007.30)
 
+
+------------------------------
+A gif example of the systems output
 ![Example of system output](https://github.com/Sam-Freitas/entropy_DIC/blob/master/scripts/output/Example_output/RENCA_A28_10FBS_3HAA_1.gif)
