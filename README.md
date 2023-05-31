@@ -5,6 +5,13 @@ This is a simple cell segmentation (isolation) algorithm that is able to segment
 
 Our implementation is for scratch assay analysis (ref: https://www.nature.com/articles/nprot.2007.30)
 
+### usage: MATLAB
+
+* Read and change the settings if necessary in /scripts/entropy_fil.m
+* Run
+```
+entropy_fil.m
+```
 
 ------------------------------
 A gif example of the systems output
