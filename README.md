@@ -14,6 +14,6 @@ entropy_fil.m
 ```
 
 ------------------------------
-A gif example of the systems output (reload 
+A gif example of the systems output (reload if gif froze)
 
 <img src="https://github.com/Sam-Freitas/entropy_DIC/blob/master/scripts/output/Example_output/RENCA_A28_10FBS_3HAA_1.gif" alt="your_alternative_text" width="885" height="704" loop=infinite>
