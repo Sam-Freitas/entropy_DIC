@@ -14,6 +14,6 @@ entropy_fil.m
 ```
 
 ------------------------------
-A gif example of the systems output
+A gif example of the systems output (reload 
 
-<img src="https://github.com/Sam-Freitas/entropy_DIC/blob/master/scripts/output/Example_output/RENCA_A28_10FBS_3HAA_1.gif" alt="your_alternative_text" width="750" height="750" loop=infinite>
+<img src="https://github.com/Sam-Freitas/entropy_DIC/blob/master/scripts/output/Example_output/RENCA_A28_10FBS_3HAA_1.gif" alt="your_alternative_text" width="885" height="704" loop=infinite>
