@@ -4,6 +4,7 @@ warning('off', 'MATLAB:MKDIR:DirectoryExists');
 
 % settings to change for specific use cases
 containing_folder = "Y:\Users\Raul Castro\Microscopes\Olympus Spining Disk\2022-02-16\ImageJ processed";
+containing_folder = "C:\Users\LabPC2\Documents\DIC images\Kayla\Scratch assay\062223";
 export_gif = 1; % export the data into a gif format - binary yes(1) no(0)
 export_frames = 0; % export the frames of the gif aswell - binary yes(1) no(0)
 use_inital_largest_mask = 1; % Use the largest intial mask for baseof the segmentation - binary yes(1) no(0)
@@ -66,7 +67,15 @@ for i = 1:length(exp_names)
     
     % this get the segmentation threshold (inflection point) 
     % smooth the histogram 
-    smooth_N = smooth(N,10,'rloess');
+    smooth_N1 = smooth(N,10,'rloess');
+    smooth_N2 = smooth(N,10);
+
+    if max(abs(diff(smooth_N1))) > max(abs(diff(smooth_N2)))
+        smooth_N = smooth_N2;
+    else
+        smooth_N = smooth_N1;
+    end
+
     % find local minimus and prominance (derivative to a point)
     [TF,P] = islocalmin(smooth_N);
     % find the largest inflextion point

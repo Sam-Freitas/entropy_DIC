@@ -1,7 +1,12 @@
 clear all
 close all force hidden
 
-num_conditions = 4;
+% This is a not ready for production yet processing step that groups ALL of
+% the produced csv's in the >output folder into num_conditions based off
+% kmeans grouping of the actual strings 
+% this is when you have multiple replicates of the the same condition
+
+num_conditions = 8;
 
 ovr_dir = fullfile(pwd,'output');
 
@@ -18,19 +23,20 @@ allExts = cellfun(@(s) s(end-2:end), {message.Name},'uni',0); % Get exts
 CSVidx = ismember(allExts,'csv');    % Search ext for "CSV" at the end
 CSV_filepaths = {message(CSVidx).Name}';  % Use CSVidx to list all paths.
 
+CSV_filepaths = natsort(CSV_filepaths);
+CSV_filepaths = CSV_filepaths(~contains(CSV_filepaths,'Example_output'));
 fprintf('There are %i files with *.CSV exts.\n',numel(CSV_filepaths));
 
-CSV_filepaths = natsort(CSV_filepaths);
-
 kmeans_idx = kmeans(char(string(CSV_filepaths)),num_conditions);
+kmeant_idx_unique_not_sorted = unique(kmeans_idx,'stable');
 
 hold on
 for i = 1:num_conditions
     
-    these_csvs = CSV_filepaths(kmeans_idx==i);
+    these_csvs = CSV_filepaths(kmeans_idx==kmeant_idx_unique_not_sorted(i));
     
     [~,this_condition,~] = fileparts(these_csvs{1});
-    condition{i} = replace(this_condition(2:end-7),'_','-');
+    condition{i} = replace(this_condition(2:end-7),'_','-'); %probably have to change this for specific use cases
     
     for j = 1:length(these_csvs)
         temp_table = readtable(these_csvs{j},'VariableNamingRule','preserve');
