@@ -10,12 +10,14 @@ export_frames = 0; % export the frames of the gif aswell - binary yes(1) no(0)
 use_inital_largest_mask = 1; % Use the largest intial mask for baseof the segmentation - binary yes(1) no(0)
 
 image_type_format = '*.tif'; % must be in format '*.xxx'
-% this is the type of images that the system will use 
+% this is the type of images that the system will use  
 % currently only tested on tif files
 
 % Data processing section
 ovr_dir = dir(containing_folder);
 ovr_dir(ismember( {ovr_dir.name}, {'.', '..'})) = [];  %remove . and ..
+dir_flags = [ovr_dir.isdir];
+ovr_dir = ovr_dir(dir_flags);
 exp_names = string(natsort({ovr_dir.name}))';
 
 mkdir('output');
