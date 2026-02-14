@@ -10,7 +10,7 @@ Our implementation is for scratch assay analysis (ref: https://www.nature.com/ar
 * Read and change the settings if necessary in /scripts/entropy_fil.m
 * Run
 ```
-entropy_fil.m
+Entropy_segment_cells_Batch.m
 ```
 
 ------------------------------
