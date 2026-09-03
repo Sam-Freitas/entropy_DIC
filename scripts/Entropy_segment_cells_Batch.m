@@ -3,24 +3,39 @@ close all force hidden
 clc
 warning('off', 'MATLAB:MKDIR:DirectoryExists');
 
-% settings to change for specific use cases
+%% settings to change for specific use cases
 containing_folder = "C:\Users\LabPC2\Desktop\DIC_image_data_test\Raul data\2022-02-16\ImageJ processed";
-experiment_name = "DIC_analysis_output2";
-containing_folder = "C:\Users\LabPC2\Desktop\DIC_image_data_test\Kayla data\20251105 - Scratch Assay\ForAnalysis";
+experiment_name = "DIC_analysis_output";
+
+% image format setting
+image_type_format = '*.tif'; % ****must**** be in format '*.xxx'
+% this is the type of images that the system will use
+% currently only tested on tif and png files
+
+% verbosity settings user interactivity
+show_progress_bar = 1; % makes a figure that gives a progress bar
+show_progress_in_terminal = 1; % displays current step to the terminal
+show_segmentation_plot = 0; % shows the segmentation plot (briefly) once calculated
+
+% image/gif export settings
+% determines the settings for the data visualization/export
 export_gif = 1; % export the data into a gif format - binary yes(1) no(0)
 export_frames = 0; % export the frames of the gif aswell - binary yes(1) no(0)
-use_inital_largest_mask = 1; % Use the largest intial mask for baseof the segmentation - binary yes(1) no(0)
+full_resolution_gif_output = 0; % exports gif (large) or not (recommended)
 
-image_type_format = '*.tif'; % must be in format '*.xxx'
-% this is the type of images that the system will use
-% currently only tested on tif files
+% mask settings 
+% this assumes the largest inital mask (in the middle) is
+% the initial start for the scratch and ignores all the other "voids" of
+% cells if there are any.
+use_initial_largest_mask = 1; % Use the largest intial mask for baseof the segmentation - binary yes(1) no(0)
 
-% verbosity settings for output
-show_progress_bar = 1;
-show_progress_in_terminal = 1;
-show_segmentation_plot = 1;
+% small object filter settings
+% this is a small object filter that if toggled removes small 'blobs' that
+% usually crop up as time goes on. It is applied after masking from the
+% initial large mask and helps reduse noise as the scratch is closing
+filter_tiny_regions = 1;
 
-% Data processing section
+%% Data processing section
 ovr_dir = dir(containing_folder);
 ovr_dir(ismember( {ovr_dir.name}, {'.', '..'})) = [];  %remove . and ..
 dir_flags = [ovr_dir.isdir];
@@ -73,6 +88,13 @@ for i = 1:length(exp_names)
     end
 
     mean_of_stack = mean(mean_vals);
+
+    if filter_tiny_regions
+        max_img_size = max(unique(cell2mat(cellfun(@(x) size(x), imgs, 'UniformOutput', false)'),'rows'),1);
+        % max img size is given as rows, columns
+        max_img_pixels = prod(max_img_size);
+        filter_size = ceil(max_img_pixels/5000);
+    end
 
     % normalize the total brightness of each image
     % to the average brightness of all the images
@@ -147,9 +169,14 @@ for i = 1:length(exp_names)
         end
         % get the mask from the entropy seperation
         E_mask = (E_imgs{j}<E_sep_point);
+
+        if filter_tiny_regions
+            E_mask = bwareaopen(E_mask,filter_size,4);
+        end
+
         % if using the initial largest mask
         % then mask of the resulting masks
-        if use_inital_largest_mask
+        if use_initial_largest_mask
             E_mask = inital_largest_mask.*E_mask;
         end
         amount_open(j) = sum(sum(E_mask));
@@ -173,6 +200,10 @@ for i = 1:length(exp_names)
             end
             out_img = [rgb_img,rgb_mask;
                 rgb_E,out_label];
+
+            if ~full_resolution_gif_output
+                out_img = imresize(out_img,1000/min(max_img_size*2));
+            end
 
             [A,map] = rgb2ind(out_img,256);
             if j == 1
@@ -214,6 +245,7 @@ end
 close all
 disp('Finished processing data')
 
+%% functions block
 
 function plot_data_simple(this_exp,edges,smooth_N,inflection_point,amount_open,path_to_export,show_segmentation_plot)
 

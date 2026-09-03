@@ -21,11 +21,15 @@ A gif example of the systems output (reload page if gif froze)
 
 ### usage: MATLAB
 
+* make sure that you have MATLAB installed with these specific toolboxes
+    * 'Image Processing Toolbox'
+    * 'Curve Fitting Toolbox'
+
 * Read and change the settings if necessary in **/scripts/Entropy_segment_cells_Batch.m**
 * most important changes are
     * **containing_folder** (path to where the TIFF folders are)
     * **experiment_name** (what the export should be called)
-* Run
+* Run the code with either F5 or the Green RUN button
 ```
 Entropy_segment_cells_Batch.m
 ```
