@@ -1,2 +1,5 @@
 scripts/output
 *.asv
+/scripts/entropy_app/output
+/scripts/output
+/scripts/testing/output
