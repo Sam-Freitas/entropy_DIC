@@ -21,7 +21,7 @@ show_segmentation_plot = 0; % shows the segmentation plot (briefly) once calcula
 % determines the settings for the data visualization/export
 export_gif = 1; % export the data into a gif format - binary yes(1) no(0)
 export_frames = 0; % export the frames of the gif aswell - binary yes(1) no(0)
-full_resolution_gif_output = 0; % exports gif (large) or not (recommended)
+full_resolution_gif_output = 1; % exports gif (large) or not (recommended)
 
 % mask settings 
 % this assumes the largest inital mask (in the middle) is
@@ -148,7 +148,7 @@ for i = 1:length(exp_names)
 
     % processing/segmentation
     E_mask_1 = (E_imgs{1} < E_sep_point);
-    inital_largest_mask = imfill(imgaussfilt(bwareafilt(E_mask_1,1)*2.5,3)>0,'holes');
+    inital_largest_mask = imfill(imgaussfilt(double(bwareafilt(E_mask_1,1)),3)>0,'holes');
 
     % this is all exporting and very little data processing
     % the amount_open is the segmentation data
